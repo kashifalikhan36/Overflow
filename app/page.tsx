@@ -9,6 +9,7 @@ import { CreateNoteModal } from '@/components/notes/create-note-modal';
 import { SearchOverlay } from '@/components/search/search-overlay';
 import { LabelsModal } from '@/components/labels/labels-modal';
 import { SettingsModal } from '@/components/settings/settings-modal';
+import { ExportModal } from '@/components/export/export-modal';
 import { useNotes } from '@/hooks/use-notes';
 import { useLabels } from '@/hooks/use-labels';
 import { Note, ViewMode } from '@/types/note';
@@ -20,22 +21,62 @@ export default function Home() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [labelsModalOpen, setLabelsModalOpen] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchFilters, setSearchFilters] = useState<any>(null);
 
   const { data: notes = [], isLoading } = useNotes();
   const { data: labels = [] } = useLabels();
 
   // Filter notes based on current view and search
   const filteredNotes = notes.filter((note: Note) => {
+    // Basic search query filter
     if (searchQuery && !note.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
-        !note.content.toLowerCase().includes(searchQuery.toLowerCase())) {
+        !note.content.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !note.labels.some(label => label.toLowerCase().includes(searchQuery.toLowerCase()))) {
       return false;
     }
+
+    // Advanced search filters
+    if (searchFilters) {
+      if (searchFilters.types && searchFilters.types.length > 0 && !searchFilters.types.includes(note.type)) {
+        return false;
+      }
+      if (searchFilters.colors && searchFilters.colors.length > 0 && !searchFilters.colors.includes(note.color)) {
+        return false;
+      }
+      if (searchFilters.labels && searchFilters.labels.length > 0 && 
+          !searchFilters.labels.some((label: string) => note.labels.includes(label))) {
+        return false;
+      }
+      if (searchFilters.pinned !== undefined && note.pinned !== searchFilters.pinned) {
+        return false;
+      }
+      if (searchFilters.archived !== undefined && note.archived !== searchFilters.archived) {
+        return false;
+      }
+      if (searchFilters.shared !== undefined && note.isShared !== searchFilters.shared) {
+        return false;
+      }
+      // Date range filter
+      if (searchFilters.dateRange) {
+        const noteDate = new Date(note.updatedAt);
+        if (searchFilters.dateRange.from && noteDate < searchFilters.dateRange.from) {
+          return false;
+        }
+        if (searchFilters.dateRange.to && noteDate > searchFilters.dateRange.to) {
+          return false;
+        }
+      }
+    }
+
+    // Label filter from sidebar
     if (selectedLabel && !note.labels.includes(selectedLabel)) {
       return false;
     }
+    
     return !note.archived;
   });
 
@@ -82,6 +123,7 @@ export default function Home() {
         onMenuClick={() => setSidebarOpen(true)}
         onSearchClick={() => setSearchOpen(true)}
         onSettingsClick={() => setSettingsModalOpen(true)}
+        onExportClick={() => setExportModalOpen(true)}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />
@@ -154,7 +196,10 @@ export default function Home() {
       <SearchOverlay
         open={searchOpen}
         onOpenChange={setSearchOpen}
-        onSearch={setSearchQuery}
+        onSearch={(query, filters) => {
+          setSearchQuery(query);
+          setSearchFilters(filters);
+        }}
         notes={notes}
       />
 

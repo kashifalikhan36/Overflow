@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, Search, Settings, Grid2x2 as Grid, List, Palette } from 'lucide-react';
+import { Menu, Search, Settings, Grid2x2 as Grid, List, Palette, Download } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { ViewMode } from '@/types/note';
@@ -12,6 +12,7 @@ interface HeaderProps {
   onMenuClick: () => void;
   onSearchClick: () => void;
   onSettingsClick: () => void;
+  onExportClick: () => void;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
 }
@@ -20,6 +21,7 @@ export function Header({
   onMenuClick,
   onSearchClick,
   onSettingsClick,
+  onExportClick,
   viewMode,
   onViewModeChange,
 }: HeaderProps) {
@@ -95,6 +97,16 @@ export function Header({
               <List className="h-4 w-4" />
             </Button>
           </div>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onExportClick}
+            className="h-9 w-9"
+            title="Export Notes"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
 
           <Button
             variant="ghost"

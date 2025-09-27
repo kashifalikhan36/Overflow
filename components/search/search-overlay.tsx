@@ -2,22 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Clock, Hash } from 'lucide-react';
+import { Search, X, Clock, Hash, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Note } from '@/types/note';
 import { cn } from '@/lib/utils';
+import { AdvancedSearch } from './advanced-search';
 
 interface SearchOverlayProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSearch: (query: string) => void;
+  onSearch: (query: string, filters?: any) => void;
   notes: Note[];
 }
 
 export function SearchOverlay({ open, onOpenChange, onSearch, notes }: SearchOverlayProps) {
   const [query, setQuery] = useState('');
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [recentSearches] = useState(['project ideas', 'meeting notes', 'todo list']);
   
   const filteredNotes = query.trim()
@@ -31,11 +33,12 @@ export function SearchOverlay({ open, onOpenChange, onSearch, notes }: SearchOve
   useEffect(() => {
     if (open) {
       setQuery('');
+      setShowAdvancedSearch(false);
     }
   }, [open]);
 
-  const handleSearch = (searchQuery: string) => {
-    onSearch(searchQuery);
+  const handleSearch = (searchQuery: string, filters?: any) => {
+    onSearch(searchQuery, filters);
     onOpenChange(false);
   };
 
@@ -73,6 +76,15 @@ export function SearchOverlay({ open, onOpenChange, onSearch, notes }: SearchOve
                 }}
                 className="flex-1 border-0 bg-transparent px-0 focus-visible:ring-0"
               />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAdvancedSearch(true)}
+                className="shrink-0"
+              >
+                <Filter className="h-4 w-4 mr-2" />
+                Advanced
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
@@ -194,6 +206,15 @@ export function SearchOverlay({ open, onOpenChange, onSearch, notes }: SearchOve
           </div>
         </motion.div>
       </motion.div>
+
+      {/* Advanced Search Modal */}
+      <AdvancedSearch
+        open={showAdvancedSearch}
+        onOpenChange={setShowAdvancedSearch}
+        notes={notes}
+        onSearch={handleSearch}
+        initialQuery={query}
+      />
     </AnimatePresence>
   );
 }
