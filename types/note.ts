@@ -7,45 +7,220 @@ export interface Note {
   labels: string[];
   pinned: boolean;
   archived: boolean;
+  deleted: boolean;
   reminder?: Reminder;
   checklist?: ChecklistItem[];
-  images?: string[];
+  images?: NoteImage[];
   audioUrl?: string;
-  drawingData?: string;
-  collaborators?: string[];
+  audioTranscription?: string;
+  drawingData?: DrawingData;
+  collaborators?: Collaborator[];
+  permissions: NotePermission;
+  formatting?: TextFormatting;
+  attachments?: Attachment[];
+  location?: Location;
+  metadata: NoteMetadata;
+  syncStatus: SyncStatus;
+  version: number;
   createdAt: string;
   updatedAt: string;
   userId: string;
 }
 
-export type NoteType = 'text' | 'checklist' | 'drawing' | 'image' | 'audio';
+export type NoteType = 'text' | 'checklist' | 'drawing' | 'image' | 'audio' | 'mixed';
 export type NoteColor = 'default' | 'red' | 'orange' | 'yellow' | 'green' | 'teal' | 'blue' | 'purple' | 'pink' | 'brown' | 'gray' | 'dark';
-export type ViewMode = 'grid' | 'list';
+export type ViewMode = 'grid' | 'list' | 'masonry';
+export type SyncStatus = 'synced' | 'pending' | 'error' | 'offline';
+export type NotePermission = 'private' | 'view' | 'edit' | 'full';
 
 export interface ChecklistItem {
   id: string;
   text: string;
   completed: boolean;
+  order: number;
+  createdAt: string;
+  completedAt?: string;
+}
+
+export interface NoteImage {
+  id: string;
+  url: string;
+  thumbnail?: string;
+  filename: string;
+  size: number;
+  mimeType: string;
+  ocrText?: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+  uploadedAt: string;
+}
+
+export interface DrawingData {
+  canvas: string; // base64 encoded canvas data
+  strokes: DrawingStroke[];
+  dimensions: {
+    width: number;
+    height: number;
+  };
+  tools: DrawingTool[];
+}
+
+export interface DrawingStroke {
+  id: string;
+  points: number[];
+  color: string;
+  width: number;
+  tool: string;
+  timestamp: number;
+}
+
+export interface DrawingTool {
+  type: 'pen' | 'brush' | 'eraser' | 'highlighter' | 'shape';
+  color: string;
+  width: number;
+  opacity: number;
+}
+
+export interface Collaborator {
+  userId: string;
+  email: string;
+  name: string;
+  avatar?: string;
+  permission: NotePermission;
+  invitedAt: string;
+  lastSeenAt?: string;
+  status: 'pending' | 'accepted' | 'declined';
 }
 
 export interface Reminder {
   id: string;
   type: 'time' | 'location';
   time?: string;
-  location?: {
-    latitude: number;
-    longitude: number;
-    address: string;
-  };
+  location?: Location;
   notified: boolean;
+  recurring?: RecurringPattern;
+  title: string;
+  description?: string;
+  createdAt: string;
+}
+
+export interface Location {
+  latitude: number;
+  longitude: number;
+  address: string;
+  radius?: number; // for location-based reminders
+}
+
+export interface RecurringPattern {
+  type: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  interval: number;
+  endDate?: string;
+  daysOfWeek?: number[]; // for weekly recurring
+  dayOfMonth?: number; // for monthly recurring
+}
+
+export interface TextFormatting {
+  bold?: number[][];
+  italic?: number[][];
+  underline?: number[][];
+  strikethrough?: number[][];
+  highlight?: Array<{ start: number; end: number; color: string }>;
+  links?: Array<{ start: number; end: number; url: string }>;
+  headings?: Array<{ start: number; end: number; level: 1 | 2 | 3 | 4 | 5 | 6 }>;
+}
+
+export interface Attachment {
+  id: string;
+  type: 'file' | 'link' | 'voice' | 'image';
+  name: string;
+  url: string;
+  size?: number;
+  mimeType?: string;
+  thumbnail?: string;
+  metadata?: any;
+  uploadedAt: string;
+}
+
+export interface NoteMetadata {
+  wordCount: number;
+  characterCount: number;
+  readingTime: number; // in minutes
+  lastViewedAt?: string;
+  viewCount: number;
+  exportCount: number;
+  shareCount: number;
+  duplicateCount: number;
+  tags: string[];
+  source?: 'web' | 'mobile' | 'desktop' | 'import' | 'voice' | 'ocr';
 }
 
 export interface Label {
   id: string;
   name: string;
   color: string;
+  description?: string;
   userId: string;
+  noteCount: number;
+  isDefault: boolean;
   createdAt: string;
+  updatedAt: string;
+}
+
+export interface SearchFilters {
+  query?: string;
+  labels?: string[];
+  colors?: NoteColor[];
+  types?: NoteType[];
+  dateRange?: {
+    start: string;
+    end: string;
+  };
+  hasReminder?: boolean;
+  hasImages?: boolean;
+  hasAudio?: boolean;
+  isShared?: boolean;
+  sortBy: 'updatedAt' | 'createdAt' | 'title' | 'relevance';
+  sortOrder: 'asc' | 'desc';
+}
+
+export interface NoteExport {
+  format: 'json' | 'markdown' | 'html' | 'pdf' | 'docx' | 'txt';
+  includeImages: boolean;
+  includeAudio: boolean;
+  includeDrawings: boolean;
+  includeMetadata: boolean;
+}
+
+export interface NotificationSettings {
+  enabled: boolean;
+  sound: boolean;
+  desktop: boolean;
+  email: boolean;
+  reminderMinutes: number[];
+}
+
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  defaultView: ViewMode;
+  defaultColor: NoteColor;
+  autoSave: boolean;
+  autoSaveInterval: number; // in seconds
+  spellCheck: boolean;
+  wordWrap: boolean;
+  showLineNumbers: boolean;
+  fontSize: 'small' | 'medium' | 'large';
+  notifications: NotificationSettings;
+  shortcuts: Record<string, string>;
+}
+
+export interface OfflineAction {
+  id: string;
+  type: 'create' | 'update' | 'delete' | 'archive' | 'pin';
+  noteId: string;
+  data: any;
+  timestamp: string;
+  synced: boolean;
 }
 
 export const NOTE_COLORS: Record<NoteColor, { bg: string; border: string; hover: string }> = {
