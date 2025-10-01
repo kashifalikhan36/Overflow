@@ -239,7 +239,24 @@ export function ExportModal({ open, onOpenChange, notes, selectedNotes }: Export
         .checklist { list-style: none; padding: 0; }
         .checklist li { padding: 4px 0; }
         .completed { text-decoration: line-through; color: #666; }
-        .note-${note.color} { border-left: 4px solid var(--color-${note.color}, #6366f1); }
+        .note-default { border-left: 4px solid #6366f1; }
+        .note-red { border-left: 4px solid #ef4444; }
+        .note-orange { border-left: 4px solid #f97316; }
+        .note-amber { border-left: 4px solid #f59e0b; }
+        .note-yellow { border-left: 4px solid #eab308; }
+        .note-lime { border-left: 4px solid #84cc16; }
+        .note-green { border-left: 4px solid #22c55e; }
+        .note-emerald { border-left: 4px solid #10b981; }
+        .note-teal { border-left: 4px solid #14b8a6; }
+        .note-cyan { border-left: 4px solid #06b6d4; }
+        .note-sky { border-left: 4px solid #0ea5e9; }
+        .note-blue { border-left: 4px solid #3b82f6; }
+        .note-indigo { border-left: 4px solid #6366f1; }
+        .note-violet { border-left: 4px solid #8b5cf6; }
+        .note-purple { border-left: 4px solid #a855f7; }
+        .note-fuchsia { border-left: 4px solid #d946ef; }
+        .note-pink { border-left: 4px solid #ec4899; }
+        .note-rose { border-left: 4px solid #f43f5e; }
     </style>
 </head>
 <body>
@@ -331,9 +348,10 @@ ${notes.map(note => `
         createdAt: note.createdAt,
         updatedAt: note.updatedAt,
         checklist: note.checklist,
-        drawings: note.drawings,
+        drawingData: note.drawingData,
         images: note.images,
-        audioRecordings: note.audioRecordings,
+        audioUrl: note.audioUrl,
+        audioTranscription: note.audioTranscription,
       })),
       metadata: {
         exportedAt: new Date().toISOString(),

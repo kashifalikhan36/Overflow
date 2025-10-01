@@ -57,7 +57,7 @@ export default function Home() {
       if (searchFilters.archived !== undefined && note.archived !== searchFilters.archived) {
         return false;
       }
-      if (searchFilters.shared !== undefined && note.isShared !== searchFilters.shared) {
+      if (searchFilters.shared !== undefined && (note.collaborators && note.collaborators.length > 0) !== searchFilters.shared) {
         return false;
       }
       // Date range filter
@@ -110,6 +110,7 @@ export default function Home() {
         setCreateModalOpen(false);
         setLabelsModalOpen(false);
         setSettingsModalOpen(false);
+        setExportModalOpen(false);
       }
     };
 
@@ -212,6 +213,12 @@ export default function Home() {
       <SettingsModal
         open={settingsModalOpen}
         onOpenChange={setSettingsModalOpen}
+      />
+
+      <ExportModal
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
+        notes={notes}
       />
     </div>
   );

@@ -49,6 +49,9 @@ import {
 } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { ExportModal } from '@/components/export/export-modal';
+import { CollaborationModal } from '@/components/collaboration/collaboration-modal';
+import { PresenceIndicator, CollaborationStatus } from '@/components/collaboration/presence-indicator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Note, ViewMode, NOTE_COLORS } from '@/types/note';
 import { useUpdateNote, useDeleteNote } from '@/hooks/use-notes';
@@ -67,6 +70,8 @@ export function NoteCard({ note, viewMode, onEdit, searchQuery }: NoteCardProps)
   const [isHovered, setIsHovered] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [collaborationModalOpen, setCollaborationModalOpen] = useState(false);
   const colorConfig = NOTE_COLORS[note.color];
   const updateNoteMutation = useUpdateNote();
   const deleteNoteMutation = useDeleteNote();
@@ -535,7 +540,7 @@ export function NoteCard({ note, viewMode, onEdit, searchQuery }: NoteCardProps)
                 <Copy className="h-4 w-4 mr-2" />
                 Copy content
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setExportModalOpen(true); }}>
                 <Download className="h-4 w-4 mr-2" />
                 Export note
               </DropdownMenuItem>
@@ -553,7 +558,7 @@ export function NoteCard({ note, viewMode, onEdit, searchQuery }: NoteCardProps)
                 Change color
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setCollaborationModalOpen(true); }}>
                 <Share2 className="h-4 w-4 mr-2" />
                 Share & collaborate
               </DropdownMenuItem>
@@ -637,6 +642,12 @@ export function NoteCard({ note, viewMode, onEdit, searchQuery }: NoteCardProps)
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Collaboration Status */}
+            <CollaborationStatus noteId={note.id} />
+            
+            {/* Presence Indicator */}
+            <PresenceIndicator noteId={note.id} maxVisible={2} />
+            
             {/* Word count for text notes */}
             {note.metadata && note.metadata.wordCount > 0 && (
               <Tooltip>
@@ -679,6 +690,25 @@ export function NoteCard({ note, viewMode, onEdit, searchQuery }: NoteCardProps)
         {/* Subtle gradient overlay for visual depth */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none rounded-xl" />
       </motion.div>
+
+      {/* Export Modal */}
+      <ExportModal
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
+        notes={[note]}
+        selectedNotes={[note]}
+      />
+
+      {/* Collaboration Modal */}
+      <CollaborationModal
+        open={collaborationModalOpen}
+        onOpenChange={setCollaborationModalOpen}
+        note={note}
+        onUpdateNote={(updates) => {
+          // This would typically trigger a note update mutation
+          updateNoteMutation.mutate({ id: note.id, ...updates });
+        }}
+      />
     </TooltipProvider>
   );
 }
