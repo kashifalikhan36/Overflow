@@ -2,6 +2,7 @@
   "name": "overflow",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -52,7 +53,7 @@
     "date-fns": "^3.6.0",
     "dexie": "^4.0.8",
     "embla-carousel-react": "^8.3.0",
-    "eslint": "^9.9.1",
+    "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.5",
     "fabric": "^6.4.3",
     "framer-motion": "^12.23.22",

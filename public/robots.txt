@@ -1,0 +1,10 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /api/admin/
+Disallow: /api/internal/
+
+# Sitemap location
+Sitemap: https://overflow.app/sitemap.xml

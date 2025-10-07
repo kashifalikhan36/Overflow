@@ -47,7 +47,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
-import { DrawingCanvas } from '@/components/drawing/drawing-canvas';
+import { DrawingCanvasWrapper as DrawingCanvas } from '@/components/drawing/drawing-canvas-wrapper';
 import { AudioRecorder } from '@/components/audio/audio-recorder';
 import { OCRImageProcessor } from '@/components/ocr/ocr-image-processor';
 import { 
