@@ -1,3 +1,5 @@
+"use client";
+
 import { Bell, Home, HelpCircle, Settings, Shield, Mail, User, FileText, Lock } from "lucide-react";
 import { ExpandableTabs } from "@/components/ui/expandable-tabs";
 

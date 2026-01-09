@@ -9,6 +9,8 @@ import { ViewMode } from '@/types/note';
 import { cn } from '@/lib/utils';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { useUser } from '@/context/user-context';
+import { Meteors } from '@/components/ui/meteors';
+import { usePreferences } from '@/context/preferences-context';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -29,13 +31,21 @@ export function Header({
 }: HeaderProps) {
   const { theme, setTheme } = useTheme();
   const { user, signIn, signOut } = useUser();
+  const { showEffects } = usePreferences();
 
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/40"
+      className="relative sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/40"
     >
+      {/* Decorative effects behind header (subtle) */}
+      {showEffects && (
+        <div className="pointer-events-none absolute inset-0 -z-10 opacity-10 hidden lg:block">
+          <Meteors number={12} />
+        </div>
+      )}
+
       <div className="flex items-center justify-between px-4 py-3 max-w-7xl mx-auto">
         <div className="flex items-center gap-4">
           <Button

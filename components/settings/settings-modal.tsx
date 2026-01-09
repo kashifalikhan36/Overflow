@@ -43,7 +43,8 @@ interface SettingsModalProps {
 
 export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
   const { theme, setTheme } = useTheme();
-  const { showImages, setShowImages } = usePreferences();
+  const { showImages, setShowImages, showEffects, setShowEffects } =
+    usePreferences();
   const [notifications, setNotifications] = useState(true);
   const [autoSync, setAutoSync] = useState(true);
   const [offlineMode, setOfflineMode] = useState(false);
@@ -94,6 +95,18 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
             <Switch
               checked={showImages}
               onCheckedChange={(v) => setShowImages(!!v)}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium">Show decorative effects</h4>
+              <p className="text-sm text-muted-foreground">
+                Enable subtle decorative background effects (e.g. meteors)
+              </p>
+            </div>
+            <Switch
+              checked={showEffects}
+              onCheckedChange={(v) => setShowEffects(!!v)}
             />
           </div>
         </div>

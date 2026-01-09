@@ -126,7 +126,9 @@ export function useCreateLabel() {
       
       return newLabel;
     },
-    onSuccess: () => {
+    onSuccess: (createdLabel: Label | unknown) => {
+      const label = createdLabel as Label;
+      queryClient.setQueryData<Label[] | undefined>(['labels'], (old) => (old ? [label, ...old] : [label]));
       queryClient.invalidateQueries({ queryKey: ['labels'] });
     },
   });
@@ -171,7 +173,9 @@ export function useUpdateLabel() {
       } as Label;
       return updatedLabel;
     },
-    onSuccess: () => {
+    onSuccess: (updatedLabel: Label | unknown) => {
+      const label = updatedLabel as Label;
+      queryClient.setQueryData<Label[] | undefined>(['labels'], (old) => (old ? old.map(l => l.id === label.id ? label : l) : [label]));
       queryClient.invalidateQueries({ queryKey: ['labels'] });
     },
   });
@@ -193,7 +197,8 @@ export function useDeleteLabel() {
       await new Promise(resolve => setTimeout(resolve, 300));
       console.log('Deleting label:', id);
     },
-    onSuccess: () => {
+    onSuccess: (_res, id) => {
+      queryClient.setQueryData<Label[] | undefined>(['labels'], (old) => (old ? old.filter(l => l.id !== (id as string)) : []));
       queryClient.invalidateQueries({ queryKey: ['labels'] });
     },
   });
