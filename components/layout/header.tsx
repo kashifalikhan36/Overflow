@@ -52,8 +52,11 @@ export function Header({
             animate={{ scale: 1 }}
             className="flex items-center gap-3"
           >
-            <div className="bg-primary/90 rounded-md p-2 flex items-center justify-center">
-              <div className="text-white font-semibold text-base leading-none">O</div>
+            <div className="rounded-md p-2 flex items-center justify-center bg-gradient-to-br from-primary/90 to-accent/70">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="9" fill="white" fillOpacity="0.06" />
+                <path d="M7 12c1.2-4 6-4 7 0 0 0 1 4-3 6-4-2-4-6-4-6z" fill="white" fillOpacity="0.9" />
+              </svg>
             </div>
             <h1 className="text-lg font-semibold tracking-tight text-foreground">Overflow</h1>
           </motion.div>
@@ -148,13 +151,9 @@ export function Header({
                 className="h-9 w-9"
                 aria-label={user?.name ? `Open menu for ${user.name}` : 'Open user menu'}
               >
-                {user?.avatar_url ? (
-                  <img src={user.avatar_url} alt={user.name ?? 'User avatar'} className="h-6 w-6 rounded-full" />
-                ) : (
-                  <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-xs font-semibold">
-                    {user?.name ? user.name.charAt(0).toUpperCase() : 'G'}
-                  </div>
-                )}
+                <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-xs font-semibold">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : 'G'}
+                </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
