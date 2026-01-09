@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Label } from '@/types/note';
 import { getLocalUserId } from '@/lib/current-user';
 import { supabase } from '@/lib/supabase';
+import { getAllLocalLabels, addLocalLabel, updateLocalLabel, deleteLocalLabel } from '@/lib/local-db';
 
 // Mock data for development
 const mockLabels: Label[] = [
@@ -76,9 +77,9 @@ export function useLabels() {
         }));
       }
 
-      // Fallback to mock data
+      // Fallback to local IndexedDB storage
       await new Promise(resolve => setTimeout(resolve, 200));
-      return mockLabels;
+      return await getAllLocalLabels();
     },
   });
 }
@@ -99,7 +100,7 @@ export function useCreateLabel() {
 
         if (error) throw error;
 
-        return {
+        const created = {
           id: data.id,
           name: data.name,
           color: data.color,
@@ -110,9 +111,11 @@ export function useCreateLabel() {
           createdAt: data.created_at,
           updatedAt: data.updated_at,
         };
+        try { await addLocalLabel(created as Label); } catch {};
+        return created as Label;
       }
 
-      // Fallback to mock behavior
+      // Fallback to mock behavior + local DB
       await new Promise(resolve => setTimeout(resolve, 300));
       const newLabel: Label = {
         ...label,
@@ -123,7 +126,7 @@ export function useCreateLabel() {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       } as Label;
-      
+      try { await addLocalLabel(newLabel); } catch {}
       return newLabel;
     },
     onSuccess: (createdLabel: Label | unknown) => {
@@ -149,7 +152,7 @@ export function useUpdateLabel() {
 
         if (error) throw error;
 
-        return {
+        const updated = {
           id: data.id,
           name: data.name,
           color: data.color,
@@ -160,9 +163,11 @@ export function useUpdateLabel() {
           createdAt: data.created_at,
           updatedAt: data.updated_at,
         } as Label;
+        try { await updateLocalLabel(updated); } catch {}
+        return updated as Label;
       }
 
-      // Fallback to mock update
+      // Fallback to mock update + DB
       await new Promise(resolve => setTimeout(resolve, 300));
       const updatedLabel = {
         id,
@@ -171,6 +176,7 @@ export function useUpdateLabel() {
         updatedAt: new Date().toISOString(),
         ...updates,
       } as Label;
+      try { await updateLocalLabel(updatedLabel); } catch {}
       return updatedLabel;
     },
     onSuccess: (updatedLabel: Label | unknown) => {
@@ -190,12 +196,13 @@ export function useDeleteLabel() {
       if (supabase) {
         const { error } = await supabase.from('labels').delete().eq('id', id);
         if (error) throw error;
+        try { await deleteLocalLabel(id); } catch {};
         return;
       }
 
-      // Fallback to mock behavior
+      // Fallback to mock behavior + DB
       await new Promise(resolve => setTimeout(resolve, 300));
-      console.log('Deleting label:', id);
+      try { await deleteLocalLabel(id); } catch {}
     },
     onSuccess: (_res, id) => {
       queryClient.setQueryData<Label[] | undefined>(['labels'], (old) => (old ? old.filter(l => l.id !== (id as string)) : []));

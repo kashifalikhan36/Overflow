@@ -57,7 +57,7 @@ import {
   ChecklistItem, 
   DrawingData, 
   NoteImage,
-  Reminder
+  Note
 } from '@/types/note';
 import { useCreateNote } from '@/hooks/use-notes';
 import { cn } from '@/lib/utils';
@@ -67,9 +67,10 @@ import { getLocalUserId } from '@/lib/current-user';
 interface CreateNoteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCreated?: (note: Note) => void;
 }
 
-export function CreateNoteModal({ open, onOpenChange }: CreateNoteModalProps) {
+export function CreateNoteModal({ open, onOpenChange, onCreated }: CreateNoteModalProps) {
   const [noteType, setNoteType] = useState<NoteType>('text');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -250,8 +251,9 @@ export function CreateNoteModal({ open, onOpenChange }: CreateNoteModalProps) {
     };
 
     try {
-      await createNoteMutation.mutateAsync(noteData);
+      const created = await createNoteMutation.mutateAsync(noteData);
       toast.success('Note created successfully!');
+      onCreated?.(created as Note);
       resetForm();
       onOpenChange(false);
     } catch (error) {

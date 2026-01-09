@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Note, NoteType, NoteColor } from '@/types/note';
 import { getLocalUserId } from '@/lib/current-user';
 import { supabase } from '@/lib/supabase';
+import { getAllLocalNotes, addLocalNote, updateLocalNote, deleteLocalNote } from '@/lib/local-db';
 
 // Helper to map Supabase rows to the Note type
 function mapRowToNote(row: any): Note {
@@ -60,9 +61,9 @@ export function useNotes() {
         return (data || []).map(mapRowToNote);
       }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return [];
+      // Fallback to local IndexedDB storage
+      await new Promise(resolve => setTimeout(resolve, 200));
+      return await getAllLocalNotes();
     },
   });
 }
@@ -95,10 +96,13 @@ export function useCreateNote() {
         const { data, error } = await supabase.from('notes').insert(insertData).select().single();
         if (error) throw error;
 
-        return mapRowToNote(data);
+        const created = mapRowToNote(data);
+        // If using local db fallback, also persist the record locally
+        try { await addLocalNote(created); } catch { /* ignore */ }
+        return created;
       }
 
-      // Simulate API call
+      // Simulate API call and persist locally
       await new Promise(resolve => setTimeout(resolve, 300));
       
       const newNote: Note = {
@@ -108,12 +112,11 @@ export function useCreateNote() {
         updatedAt: new Date().toISOString(),
         userId: (note as any).userId || getLocalUserId(),
       };
-      
+      await addLocalNote(newNote);
       return newNote;
     },
     onSuccess: (createdNote: Note | unknown) => {
       const newNote = createdNote as Note;
-      // Update cache immediately so UI reflects new note
       queryClient.setQueryData<Note[] | undefined>(['notes'], (old) => {
         return old ? [newNote, ...old] : [newNote];
       });
@@ -149,14 +152,15 @@ export function useUpdateNote() {
         const { data, error } = await supabase.from('notes').update(updatePayload).eq('id', id).select().single();
         if (error) throw error;
 
-        return mapRowToNote(data);
+        const mapped = mapRowToNote(data);
+        await updateLocalNote(mapped);
+        return mapped;
       }
 
-      // Simulate API call
+      // Simulate API call and update local DB
       await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // In a real app, this would update the note in the database
       const updatedNote = { ...updates, id, updatedAt: new Date().toISOString() } as Note;
+      await updateLocalNote(updatedNote);
       return updatedNote;
     },
     onSuccess: (updatedNote: Note | unknown) => {
@@ -179,14 +183,13 @@ export function useDeleteNote() {
       if (supabase) {
         const { error } = await supabase.from('notes').delete().eq('id', id);
         if (error) throw error;
+        try { await deleteLocalNote(id); } catch (err) { /* ignore */ }
         return;
       }
       
-      // Simulate API call
+      // Simulate API call and delete locally
       await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // In a real app, this would delete the note from the database
-      console.log('Deleting note:', id);
+      await deleteLocalNote(id);
     },
     onSuccess: (_result, id) => {
       queryClient.setQueryData<Note[] | undefined>(['notes'], (old) => (old ? old.filter(n => n.id !== id) : []));
