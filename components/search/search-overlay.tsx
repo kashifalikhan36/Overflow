@@ -147,7 +147,7 @@ export function SearchOverlay({ open, onOpenChange, onSearch, notes }: SearchOve
                         <Search className="h-8 w-8 text-muted-foreground" />
                       </div>
                       <p className="text-sm text-muted-foreground mb-4">
-                        No notes found for "{query}"
+                        No notes found for “{query}”
                       </p>
                       <Button
                         variant="outline"

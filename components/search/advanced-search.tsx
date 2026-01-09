@@ -596,7 +596,7 @@ export function AdvancedSearch({
               {filters.query && (
                 <Badge variant="secondary" className="gap-1">
                   <Search className="h-3 w-3" />
-                  "{filters.query}"
+                  “{filters.query}”
                   <button
                     onClick={() => {
                       setSearchQuery('');

@@ -534,7 +534,7 @@ export function LabelsModal({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Label</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{deletingLabel?.name}"? This action cannot be undone.
+              Are you sure you want to delete <strong>{deletingLabel?.name}</strong>? This action cannot be undone.
               The label will be removed from all notes that use it.
             </AlertDialogDescription>
           </AlertDialogHeader>

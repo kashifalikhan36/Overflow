@@ -52,12 +52,10 @@ export function Header({
             animate={{ scale: 1 }}
             className="flex items-center gap-3"
           >
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-2">
-              <div className="text-white font-bold text-lg leading-none">O</div>
+            <div className="bg-primary/90 rounded-md p-2 flex items-center justify-center">
+              <div className="text-white font-semibold text-base leading-none">O</div>
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Overflow
-            </h1>
+            <h1 className="text-lg font-semibold tracking-tight text-foreground">Overflow</h1>
           </motion.div>
         </div>
 

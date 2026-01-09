@@ -546,7 +546,7 @@ ${notes.map(note => `
                       Compatibility Notice
                     </div>
                     <div className="text-sm text-orange-700 mt-1">
-                      {incompatibleNotes.length} notes won't be included because {selectedOption.name} doesn't support their format.
+                      {incompatibleNotes.length} notes won&apos;t be included because {selectedOption.name} doesn&apos;t support their format.
                       Consider using JSON or ZIP format for complete backup.
                     </div>
                   </div>
