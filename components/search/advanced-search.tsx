@@ -70,6 +70,7 @@ interface AdvancedSearchProps {
   onSearch: (query: string) => void;
   onFilter: (filters: SearchFilters) => void;
   initialFilters?: SearchFilters;
+  initialQuery?: string;
 }
 
 const noteTypeOptions = [
@@ -117,9 +118,10 @@ export function AdvancedSearch({
   notes, 
   onSearch, 
   onFilter,
-  initialFilters 
+  initialFilters,
+  initialQuery
 }: AdvancedSearchProps) {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialQuery ?? '');
   const [filters, setFilters] = useState<SearchFilters>({
     query: '',
     labels: [],

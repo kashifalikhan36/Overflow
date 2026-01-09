@@ -36,7 +36,10 @@ export function LabelsModal({ open, onOpenChange, labels }: LabelsModalProps) {
       name: newLabelName,
       color: newLabelColor,
       userId: 'current-user',
+      noteCount: 0,
+      isDefault: false,
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
     
     console.log('Creating label:', newLabel);

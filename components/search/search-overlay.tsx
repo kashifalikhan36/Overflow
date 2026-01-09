@@ -213,6 +213,7 @@ export function SearchOverlay({ open, onOpenChange, onSearch, notes }: SearchOve
         onOpenChange={setShowAdvancedSearch}
         notes={notes}
         onSearch={handleSearch}
+        onFilter={(filters) => onSearch(query, filters)}
         initialQuery={query}
       />
     </AnimatePresence>

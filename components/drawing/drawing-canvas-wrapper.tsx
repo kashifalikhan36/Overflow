@@ -22,6 +22,9 @@ const DrawingCanvasComponent = dynamic(
 interface DrawingCanvasWrapperProps {
   onSave: (data: DrawingData) => void;
   initialData?: DrawingData;
+  width?: number;
+  height?: number;
+  readonly?: boolean;
 }
 
 export function DrawingCanvasWrapper(props: DrawingCanvasWrapperProps) {

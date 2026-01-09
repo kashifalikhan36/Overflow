@@ -8,7 +8,7 @@ export interface Note {
   pinned: boolean;
   archived: boolean;
   deleted: boolean;
-  reminder?: Reminder;
+  reminder?: Reminder | null;
   checklist?: ChecklistItem[];
   images?: NoteImage[];
   audioUrl?: string;
