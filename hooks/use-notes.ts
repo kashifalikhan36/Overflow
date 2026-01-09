@@ -10,7 +10,7 @@ const mockNotes: Note[] = [
   {
     id: '1',
     title: 'Welcome to Overflow',
-    content: 'This is your first note in Overflow! You can create text notes, checklists, add images, record audio, and much more. Try creating a new note using the + button.',
+    content: 'Welcome! Create your first note with the + button (or press Ctrl+N). Use Ctrl+K to search your notes.',
     type: 'text',
     color: 'blue',
     labels: ['welcome', 'getting-started'],
@@ -21,8 +21,8 @@ const mockNotes: Note[] = [
     syncStatus: 'synced',
     version: 1,
     metadata: {
-      wordCount: 32,
-      characterCount: 188,
+      wordCount: 12,
+      characterCount: 84,
       readingTime: 1,
       viewCount: 5,
       exportCount: 0,

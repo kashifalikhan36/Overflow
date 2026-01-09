@@ -181,6 +181,8 @@ export default function Home() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setCreateModalOpen(true)}
+        aria-label="Create note"
+        title="Create note"
         className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-200"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
