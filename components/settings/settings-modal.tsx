@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { usePreferences } from '@/context/preferences-context';
 
 interface SettingsModalProps {
   open: boolean;
@@ -42,6 +43,7 @@ interface SettingsModalProps {
 
 export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
   const { theme, setTheme } = useTheme();
+  const { showImages, setShowImages } = usePreferences();
   const [notifications, setNotifications] = useState(true);
   const [autoSync, setAutoSync] = useState(true);
   const [offlineMode, setOfflineMode] = useState(false);
@@ -81,6 +83,18 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium">Show image previews</h4>
+              <p className="text-sm text-muted-foreground">
+                Toggle to hide image thumbnails across the app
+              </p>
+            </div>
+            <Switch
+              checked={showImages}
+              onCheckedChange={(v) => setShowImages(!!v)}
+            />
           </div>
         </div>
       ),

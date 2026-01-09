@@ -58,6 +58,7 @@ import { useUpdateNote, useDeleteNote } from '@/hooks/use-notes';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow, format } from 'date-fns';
 import toast from 'react-hot-toast';
+import { usePreferences } from '@/context/preferences-context';
 
 interface NoteCardProps {
   note: Note;
@@ -75,6 +76,7 @@ export function NoteCard({ note, viewMode, onEdit, searchQuery }: NoteCardProps)
   const colorConfig = NOTE_COLORS[note.color];
   const updateNoteMutation = useUpdateNote();
   const deleteNoteMutation = useDeleteNote();
+  const { showImages } = usePreferences();
 
   const handlePin = async () => {
     try {
@@ -226,11 +228,17 @@ export function NoteCard({ note, viewMode, onEdit, searchQuery }: NoteCardProps)
           <div className="space-y-2">
             {note.drawingData?.canvas && (
               <div className="relative">
-                <img
-                  src={note.drawingData.canvas}
-                  alt="Drawing"
-                  className="w-full h-32 object-cover rounded border"
-                />
+                {showImages ? (
+                  <img
+                    src={note.drawingData.canvas}
+                    alt="Drawing"
+                    className="w-full h-32 object-cover rounded border"
+                  />
+                ) : (
+                  <div className="w-full h-32 bg-muted rounded border flex items-center justify-center text-sm text-muted-foreground">
+                    Image previews are hidden in settings
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors rounded flex items-center justify-center opacity-0 hover:opacity-100">
                   <Eye className="h-6 w-6 text-white" />
                 </div>
@@ -251,11 +259,17 @@ export function NoteCard({ note, viewMode, onEdit, searchQuery }: NoteCardProps)
               <div className="grid grid-cols-2 gap-2">
                 {note.images.slice(0, 4).map((image, index) => (
                   <div key={image.id} className="relative group">
-                    <img
-                      src={image.thumbnail || image.url}
-                      alt={image.filename}
-                      className="w-full h-20 object-cover rounded border"
-                    />
+                    {showImages ? (
+                      <img
+                        src={image.thumbnail || image.url}
+                        alt={image.filename}
+                        className="w-full h-20 object-cover rounded border"
+                      />
+                    ) : (
+                      <div className="w-full h-20 bg-muted rounded border flex items-center justify-center text-xs text-muted-foreground">
+                        Preview hidden
+                      </div>
+                    )}
                     {image.ocrText && (
                       <div className="absolute top-1 right-1 bg-green-500 text-white rounded-full p-1">
                         <FileText className="h-2 w-2" />

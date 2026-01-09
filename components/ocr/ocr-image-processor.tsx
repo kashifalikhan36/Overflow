@@ -24,6 +24,7 @@ import {
   Edit3
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { usePreferences } from '@/context/preferences-context';
 
 interface OCRImageProcessorProps {
   onSave: (images: NoteImage[]) => void;
@@ -51,6 +52,7 @@ export function OCRImageProcessor({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { showImages } = usePreferences();
 
   const handleFileSelect = useCallback(async (files: FileList) => {
     if (readonly) return;
@@ -339,11 +341,17 @@ export function OCRImageProcessor({
             {images.map((image) => (
               <Card key={image.id} className="overflow-hidden">
                 <div className="aspect-square relative group">
-                  <img
-                    src={image.thumbnail || image.url}
-                    alt={image.filename}
-                    className="w-full h-full object-cover"
-                  />
+                  {showImages ? (
+                    <img
+                      src={image.thumbnail || image.url}
+                      alt={image.filename}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center text-sm text-muted-foreground">
+                      Preview hidden
+                    </div>
+                  )}
                   
                   {/* Overlay Actions */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
