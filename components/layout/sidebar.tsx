@@ -5,6 +5,7 @@ import { Chrome as Home, Bell, Tag, Archive, Trash2, Plus, X, Hash, Star } from 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/types/note';
 import { cn } from '@/lib/utils';
+import { ExpandableTabs } from '@/components/ui/expandable-tabs';
 
 interface SidebarProps {
   open: boolean;
@@ -31,6 +32,23 @@ export function Sidebar({
   onLabelSelect,
   onLabelsClick,
 }: SidebarProps) {
+  const tabs = [
+    { title: 'All Notes', icon: Home },
+    { title: 'Reminders', icon: Bell },
+    { title: 'Pinned', icon: Star },
+    { type: 'separator' as const },
+    { title: 'Archive', icon: Archive },
+    { title: 'Trash', icon: Trash2 },
+  ];
+
+  const handleTabChange = (index: number | null) => {
+    if (index === null) return;
+    const tab = tabs[index] as any;
+    if (tab.type === 'separator') return;
+    // For now, just reset label filter when a navigation tab is selected
+    onLabelSelect(null);
+  };
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -83,38 +101,9 @@ export function Sidebar({
               )}
             </AnimatePresence>
 
-            <nav className="space-y-2">
-              {navigationItems.map((item) => (
-                <motion.div
-                  key={item.id}
-                  whileHover={{ x: 4 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start gap-3 h-10",
-                      !open && "lg:w-10 lg:px-0 lg:justify-center"
-                    )}
-                    onClick={() => onLabelSelect(null)}
-                  >
-                    <item.icon className="h-5 w-5 shrink-0" />
-                    <AnimatePresence>
-                      {open && (
-                        <motion.span
-                          initial={{ opacity: 0, width: 0 }}
-                          animate={{ opacity: 1, width: 'auto' }}
-                          exit={{ opacity: 0, width: 0 }}
-                          className="truncate"
-                        >
-                          {item.label}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                  </Button>
-                </motion.div>
-              ))}
-            </nav>
+            <div className="mb-4">
+              <ExpandableTabs tabs={tabs} onChange={handleTabChange} className="w-full" activeColor="text-primary" />
+            </div>
           </div>
 
           <div className="flex-1 p-4 border-t border-border">
