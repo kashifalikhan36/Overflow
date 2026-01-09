@@ -62,6 +62,7 @@ import {
 import { useCreateNote } from '@/hooks/use-notes';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import { getLocalUserId } from '@/lib/current-user';
 
 interface CreateNoteModalProps {
   open: boolean;
@@ -245,7 +246,7 @@ export function CreateNoteModal({ open, onOpenChange }: CreateNoteModalProps) {
       },
       syncStatus: 'pending' as const,
       version: 1,
-      userId: 'current-user',
+      userId: getLocalUserId(),
     };
 
     try {

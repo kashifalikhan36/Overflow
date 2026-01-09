@@ -15,6 +15,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/types/note';
 import { cn } from '@/lib/utils';
+import { getLocalUserId } from '@/lib/current-user';
 
 interface LabelsModalProps {
   open: boolean;
@@ -35,7 +36,7 @@ export function LabelsModal({ open, onOpenChange, labels }: LabelsModalProps) {
       id: Date.now().toString(),
       name: newLabelName,
       color: newLabelColor,
-      userId: 'current-user',
+      userId: getLocalUserId(),
       noteCount: 0,
       isDefault: false,
       createdAt: new Date().toISOString(),

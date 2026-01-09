@@ -2,6 +2,8 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Label } from '@/types/note';
+import { getLocalUserId } from '@/lib/current-user';
+import { supabase } from '@/lib/supabase';
 
 // Mock data for development
 const mockLabels: Label[] = [
@@ -9,7 +11,7 @@ const mockLabels: Label[] = [
     id: '1',
     name: 'personal',
     color: '#10b981',
-    userId: 'current-user',
+    userId: getLocalUserId(),
     noteCount: 0,
     isDefault: false,
     createdAt: '2024-01-01T10:00:00Z',
@@ -19,7 +21,7 @@ const mockLabels: Label[] = [
     id: '2',
     name: 'work',
     color: '#3b82f6',
-    userId: 'current-user',
+    userId: getLocalUserId(),
     noteCount: 0,
     isDefault: false,
     createdAt: '2024-01-01T10:00:00Z',
@@ -29,7 +31,7 @@ const mockLabels: Label[] = [
     id: '3',
     name: 'ideas',
     color: '#8b5cf6',
-    userId: 'current-user',
+    userId: getLocalUserId(),
     noteCount: 0,
     isDefault: false,
     createdAt: '2024-01-01T10:00:00Z',
@@ -39,7 +41,7 @@ const mockLabels: Label[] = [
     id: '4',
     name: 'shopping',
     color: '#f59e0b',
-    userId: 'current-user',
+    userId: getLocalUserId(),
     noteCount: 0,
     isDefault: false,
     createdAt: '2024-01-01T10:00:00Z',
@@ -51,7 +53,30 @@ export function useLabels() {
   return useQuery({
     queryKey: ['labels'],
     queryFn: async (): Promise<Label[]> => {
-      // Simulate API call
+      // If Supabase is configured, fetch real data
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('labels')
+          .select('*')
+          .eq('user_id', getLocalUserId())
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        return (data || []).map((d: any) => ({
+          id: d.id,
+          name: d.name,
+          color: d.color,
+          description: d.description || undefined,
+          userId: d.user_id,
+          noteCount: d.note_count ?? 0,
+          isDefault: d.is_default ?? false,
+          createdAt: d.created_at,
+          updatedAt: d.updated_at,
+        }));
+      }
+
+      // Fallback to mock data
       await new Promise(resolve => setTimeout(resolve, 200));
       return mockLabels;
     },
@@ -63,12 +88,36 @@ export function useCreateLabel() {
   
   return useMutation({
     mutationFn: async (label: Omit<Label, 'id' | 'createdAt' | 'updatedAt' | 'noteCount' | 'isDefault'>): Promise<Label> => {
-      // Simulate API call
+      // If Supabase is configured, insert into DB
+      if (supabase) {
+        const { data, error } = await supabase.from('labels').insert({
+          user_id: label.userId || getLocalUserId(),
+          name: label.name,
+          color: label.color,
+          description: (label as any).description || null,
+        }).select().single();
+
+        if (error) throw error;
+
+        return {
+          id: data.id,
+          name: data.name,
+          color: data.color,
+          description: data.description ?? undefined,
+          userId: data.user_id,
+          noteCount: 0,
+          isDefault: false,
+          createdAt: data.created_at,
+          updatedAt: data.updated_at,
+        };
+      }
+
+      // Fallback to mock behavior
       await new Promise(resolve => setTimeout(resolve, 300));
-      
       const newLabel: Label = {
         ...label,
         id: Date.now().toString(),
+        userId: (label as any).userId || getLocalUserId(),
         noteCount: 0,
         isDefault: false,
         createdAt: new Date().toISOString(),
@@ -88,9 +137,31 @@ export function useUpdateLabel() {
   
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Label> & { id: string }): Promise<Label> => {
-      // Simulate API call
+      // If Supabase is configured, update DB
+      if (supabase) {
+        const { data, error } = await supabase.from('labels').update({
+          name: (updates as any).name,
+          color: (updates as any).color,
+          description: (updates as any).description ?? null,
+        }).eq('id', id).select().single();
+
+        if (error) throw error;
+
+        return {
+          id: data.id,
+          name: data.name,
+          color: data.color,
+          description: data.description ?? undefined,
+          userId: data.user_id,
+          noteCount: 0,
+          isDefault: false,
+          createdAt: data.created_at,
+          updatedAt: data.updated_at,
+        } as Label;
+      }
+
+      // Fallback to mock update
       await new Promise(resolve => setTimeout(resolve, 300));
-      
       const updatedLabel = {
         id,
         noteCount: typeof updates.noteCount === 'number' ? updates.noteCount : 0,
@@ -111,7 +182,14 @@ export function useDeleteLabel() {
   
   return useMutation({
     mutationFn: async (id: string): Promise<void> => {
-      // Simulate API call
+      // If Supabase is configured, delete from DB
+      if (supabase) {
+        const { error } = await supabase.from('labels').delete().eq('id', id);
+        if (error) throw error;
+        return;
+      }
+
+      // Fallback to mock behavior
       await new Promise(resolve => setTimeout(resolve, 300));
       console.log('Deleting label:', id);
     },

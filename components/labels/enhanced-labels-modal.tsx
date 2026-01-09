@@ -53,6 +53,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { getLocalUserId } from '@/lib/current-user';
 
 interface LabelsModalProps {
   open: boolean;
@@ -141,7 +142,7 @@ export function LabelsModal({
         name: newLabelName.trim(),
         color: newLabelColor,
         description: '',
-        userId: 'current-user',
+        userId: getLocalUserId(),
         noteCount: 0,
         isDefault: false,
         createdAt: new Date().toISOString(),
