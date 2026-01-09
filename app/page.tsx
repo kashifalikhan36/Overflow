@@ -26,6 +26,8 @@ export default function Home() {
   const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFilters, setSearchFilters] = useState<any>(null);
+  const [highlightedNoteId, setHighlightedNoteId] = useState<string | null>(null);
+  const [editingNote, setEditingNote] = useState<Note | null>(null);
 
   const { data: notes = [], isLoading } = useNotes();
   const { data: labels = [] } = useLabels();
@@ -168,6 +170,11 @@ export default function Home() {
                     notes={sortedNotes}
                     viewMode={viewMode}
                     searchQuery={searchQuery}
+                    highlightedNoteId={highlightedNoteId || undefined}
+                    onEdit={(note) => {
+                      setEditingNote(note);
+                      setCreateModalOpen(true);
+                    }}
                   />
                 </motion.div>
               )}
@@ -193,7 +200,20 @@ export default function Home() {
       {/* Modals */}
       <CreateNoteModal
         open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
+        onOpenChange={(open) => {
+          setCreateModalOpen(open);
+          if (!open) setEditingNote(null);
+        }}
+        initialNote={editingNote || undefined}
+        onSaved={(note) => {
+          setSearchQuery('');
+          setSearchFilters(null);
+          setSelectedLabel(null);
+          setViewMode('grid');
+          setHighlightedNoteId(note.id);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setTimeout(() => setHighlightedNoteId(null), 3000);
+        }}
       />
 
       <SearchOverlay

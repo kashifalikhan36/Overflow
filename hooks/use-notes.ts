@@ -117,6 +117,8 @@ export function useCreateNote() {
     },
     onSuccess: (createdNote: Note | unknown) => {
       const newNote = createdNote as Note;
+      console.log('Note created (onSuccess):', newNote);
+      // Update cache immediately so UI reflects new note
       queryClient.setQueryData<Note[] | undefined>(['notes'], (old) => {
         return old ? [newNote, ...old] : [newNote];
       });

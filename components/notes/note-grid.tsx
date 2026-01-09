@@ -9,9 +9,11 @@ interface NoteGridProps {
   notes: Note[];
   viewMode: ViewMode;
   searchQuery: string;
+  highlightedNoteId?: string;
+  onEdit?: (note: Note) => void;
 }
 
-export function NoteGrid({ notes, viewMode, searchQuery }: NoteGridProps) {
+export function NoteGrid({ notes, viewMode, searchQuery, highlightedNoteId, onEdit }: NoteGridProps) {
   if (notes.length === 0) {
     return (
       <motion.div
@@ -79,10 +81,11 @@ export function NoteGrid({ notes, viewMode, searchQuery }: NoteGridProps) {
           variants={itemVariants}
           layout
           className={cn(
-            viewMode === 'grid' && "break-inside-avoid mb-4"
+            viewMode === 'grid' && "break-inside-avoid mb-4",
+            note.id === highlightedNoteId && "ring-2 ring-primary/40 animate-fade-in"
           )}
         >
-          <NoteCard note={note} viewMode={viewMode} />
+          <NoteCard note={note} viewMode={viewMode} onEdit={onEdit} />
         </motion.div>
       ))}
     </motion.div>

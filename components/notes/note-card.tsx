@@ -546,9 +546,9 @@ export function NoteCard({ note, viewMode, onEdit, searchQuery }: NoteCardProps)
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                <Edit3 className="h-4 w-4 mr-2" />
-                Edit note
+              <DropdownMenuItem onClick={() => onEdit?.(note)}>
+                <Edit3 className="h-3 w-3 mr-2" />
+                Edit
               </DropdownMenuItem>
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleCopy(); }}>
                 <Copy className="h-4 w-4 mr-2" />

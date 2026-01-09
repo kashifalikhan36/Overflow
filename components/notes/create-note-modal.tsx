@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Type, 
@@ -57,9 +57,10 @@ import {
   ChecklistItem, 
   DrawingData, 
   NoteImage,
-  Note
+  Note,
+  Reminder
 } from '@/types/note';
-import { useCreateNote } from '@/hooks/use-notes';
+import { useCreateNote, useUpdateNote } from '@/hooks/use-notes';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { getLocalUserId } from '@/lib/current-user';
@@ -67,10 +68,11 @@ import { getLocalUserId } from '@/lib/current-user';
 interface CreateNoteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreated?: (note: Note) => void;
+  initialNote?: Note;
+  onSaved?: (note: Note) => void;
 }
 
-export function CreateNoteModal({ open, onOpenChange, onCreated }: CreateNoteModalProps) {
+export function CreateNoteModal({ open, onOpenChange, initialNote, onSaved }: CreateNoteModalProps) {
   const [noteType, setNoteType] = useState<NoteType>('text');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -89,6 +91,26 @@ export function CreateNoteModal({ open, onOpenChange, onCreated }: CreateNoteMod
   const [activeTab, setActiveTab] = useState('content');
   
   const createNoteMutation = useCreateNote();
+  const updateNoteMutation = useUpdateNote();
+
+  // Initialize form fields from initialNote when editing
+  useEffect(() => {
+    if (initialNote && open) {
+      setNoteType(initialNote.type);
+      setTitle(initialNote.title || '');
+      setContent(initialNote.content || '');
+      setColor(initialNote.color || 'default');
+      setPinned(initialNote.pinned || false);
+      setChecklist(initialNote.checklist || []);
+      setDrawingData(initialNote.drawingData || null);
+      setAudioUrl(initialNote.audioUrl || '');
+      setAudioTranscription(initialNote.audioTranscription || '');
+      setImages(initialNote.images || []);
+      setLabels(initialNote.labels || []);
+      setReminder(initialNote.reminder || null);
+      setIsCollaborative(initialNote.permissions !== 'private');
+    }
+  }, [initialNote, open]);
 
   const noteTypes = [
     { type: 'text' as NoteType, label: 'Text', icon: Type, description: 'Rich text note with formatting' },
@@ -217,7 +239,7 @@ export function CreateNoteModal({ open, onOpenChange, onCreated }: CreateNoteMod
       return;
     }
 
-    const noteData = {
+    const notePayload = {
       title: title.trim() || 'Untitled Note',
       content,
       type: noteType,
@@ -251,14 +273,25 @@ export function CreateNoteModal({ open, onOpenChange, onCreated }: CreateNoteMod
     };
 
     try {
-      const created = await createNoteMutation.mutateAsync(noteData);
-      toast.success('Note created successfully!');
-      onCreated?.(created as Note);
-      resetForm();
-      onOpenChange(false);
+      if (initialNote) {
+        // Update existing note
+        const updated = await updateNoteMutation.mutateAsync({ id: initialNote.id, ...notePayload });
+        toast.success('Note updated successfully!');
+        onSaved?.(updated as Note);
+        resetForm();
+        onOpenChange(false);
+      } else {
+        // Create new note
+        const created = await createNoteMutation.mutateAsync(notePayload as any);
+        console.log('Note created (mutateAsync):', created);
+        toast.success('Note created successfully!');
+        onSaved?.(created as Note);
+        resetForm();
+        onOpenChange(false);
+      }
     } catch (error) {
-      console.error('Failed to create note:', error);
-      toast.error('Failed to create note');
+      console.error('Failed to save note:', error);
+      toast.error('Failed to save note');
     }
   };
 
@@ -511,7 +544,7 @@ export function CreateNoteModal({ open, onOpenChange, onCreated }: CreateNoteMod
       <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-semibold">Create New Note</DialogTitle>
+            <DialogTitle className="text-xl font-semibold">{initialNote ? 'Edit Note' : 'Create New Note'}</DialogTitle>
             <div className="flex items-center gap-2">
               {/* Note Type Selector */}
               <Popover>
@@ -683,11 +716,11 @@ export function CreateNoteModal({ open, onOpenChange, onCreated }: CreateNoteMod
               </Button>
               <Button 
                 onClick={handleSave} 
-                disabled={createNoteMutation.isPending}
+                disabled={createNoteMutation.isPending || updateNoteMutation.isPending}
                 className="min-w-24"
               >
                 <Save className="h-4 w-4 mr-2" />
-                {createNoteMutation.isPending ? 'Saving...' : 'Save Note'}
+                {initialNote ? 'Save Changes' : (createNoteMutation.isPending || updateNoteMutation.isPending) ? 'Saving...' : 'Save Note'}
               </Button>
             </div>
           </div>
